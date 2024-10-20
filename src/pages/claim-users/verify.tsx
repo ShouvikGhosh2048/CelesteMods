@@ -33,7 +33,7 @@ const useStyles = createStyles(
 
 
 const VerifyClaim: NextPage = () => {
-    const { status, data: sessionData } = useSession();
+    const { status: sessionStatus, data: sessionData } = useSession();
 
 
     const userClaimsQuery = api.user.userClaim.getAll.useQuery({}, { queryKey: ["user.userClaim.getAll", {}] });
@@ -61,7 +61,7 @@ const VerifyClaim: NextPage = () => {
     const rejectUserClaimMutation = api.user.userClaim.delete.useMutation({ onSuccess });
 
 
-    const isLoading = status === "loading";
+    const isLoading = sessionStatus === "loading";
 
     const isUserPermitted = !isLoading && sessionData !== null && isPermitted(sessionData.user.permissions, ADMIN_PERMISSION_STRINGS);
 
@@ -89,7 +89,7 @@ const VerifyClaim: NextPage = () => {
             pathname={VERIFY_CLAIM_PATHNAME}
         >
             <Modal
-                opened={!isLoading && claimToVerify !== null}    // TODO!!!: see if `status` can be referenced here directly. TypeScript threw an error here due to an unexpectedly narrowed type.
+                opened={!isLoading && claimToVerify !== null}    // TODO!!!: see if `sessionStatus` can be referenced here directly. TypeScript threw an error here due to an unexpectedly narrowed type.
                 onClose={() => { setClaimToVerify(null); }}
                 title="Verify Claim"
                 centered

@@ -4,10 +4,12 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Layout } from "~/components/layout/layout";
 import { cmlDiscordInviteUrl } from "~/consts/cmlDiscordInviteUrl";
-import { CLAIM_USER_PATHNAME } from "~/consts/pathnames";
+import { CLAIM_USER_PATHNAME, VERIFY_CLAIM_PATHNAME } from "~/consts/pathnames";
+import { ADMIN_PERMISSION_STRINGS } from "~/server/api/utils/permissions";
 import { pageContentHeightPixels } from "~/styles/pageContentHeightPixels";
 import { pageTitle } from "~/styles/pageTitle";
 import { api } from "~/utils/api";
+import { isPermitted } from "~/utils/permissions";
 
 
 
@@ -25,7 +27,7 @@ const useStyles = createStyles(
             height: `${pageContentHeightPixels}px`,
             color: theme.white,
         },
-        discordLink: {
+        link: {
             textDecoration: "underline",
         },
         sectionTitle: {
@@ -43,7 +45,7 @@ const useStyles = createStyles(
 
 
 const ClaimUser: NextPage = () => {
-    const { status, data: sessionData } = useSession();
+    const { status: sessionStatus, data: sessionData } = useSession();
     const userId = sessionData?.user.id ?? "";
 
 
@@ -83,10 +85,15 @@ const ClaimUser: NextPage = () => {
     });
 
 
+    const isLoading = sessionStatus === "loading";
+
+    const isAdmin = !isLoading && sessionData !== null && isPermitted(sessionData.user.permissions, ADMIN_PERMISSION_STRINGS);
+
+
     const { classes } = useStyles();
 
 
-    if (status === "unauthenticated") {
+    if (sessionStatus === "unauthenticated") {
         return (
             <Layout
                 pageTitle={PAGE_TITLE}
@@ -110,12 +117,17 @@ const ClaimUser: NextPage = () => {
                 className={classes.scrollArea}
             >
                 <LoadingOverlay
-                    visible={status === "loading"}
+                    visible={isLoading}
                 />
                 <Title className={classes.pageTitle} order={1}>{PAGE_TITLE}</Title>
+                {isAdmin && (
+                    <p>
+                        Click <Link className={classes.link} href={VERIFY_CLAIM_PATHNAME}>here</Link> to verify users.
+                    </p>
+                )}
                 <Title order={2}>Active Claims</Title>
                 <p className={classes.sectionInfo}>
-                    Contact us on <Link href={cmlDiscordInviteUrl} className={classes.discordLink} target="_blank">Discord</Link> to get your claims verified.
+                    Contact us on <Link href={cmlDiscordInviteUrl} className={classes.link} target="_blank">Discord</Link> to get your claims verified.
                 </p>
                 <Table>
                     <thead>
