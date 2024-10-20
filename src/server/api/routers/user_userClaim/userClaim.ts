@@ -355,7 +355,7 @@ export const userClaimRouter = createTRPCRouter({
 
 
                     // delete the user after all the other updates have been made, so that a race condition where the delete partially cascades to updating values doesn't occur
-                    // this delete should cascade to the userClaim as well (TODO!!!: confirm this and update this comment accordingly or add a deletion of the userClaim)
+                    // the deletion automatically cascades to the userClaim
                     await ctx.prisma.user.delete({
                         where: {
                             id: claim.claimedUserId,
