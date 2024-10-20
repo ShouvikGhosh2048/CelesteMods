@@ -283,7 +283,6 @@ export const userClaimRouter = createTRPCRouter({
             };
 
 
-            //TODO!!!: make sure nothing was missed here
             // A deeply nested request *may* work here, but I'm not sure. It would be more work and harder to read, but would probably be marginally faster. IMO, it's not worth bothering.
             await ctx.prisma.$transaction(
                 async (transactionPrisma) => {  // using an interactive transaction to allow verifying that the claiming user still exists before making changes
@@ -333,6 +332,7 @@ export const userClaimRouter = createTRPCRouter({
                         transactionPrisma.map_Archive.updateMany(updateApprovedBy as Prisma.Map_ArchiveUpdateManyArgs),
 
                         transactionPrisma.mod_Edit.updateMany(updateSubmittedBy as Prisma.Mod_EditUpdateManyArgs),
+
                         transactionPrisma.map_Edit.updateMany(updateMapperUserId as Prisma.Map_EditUpdateManyArgs),
                         transactionPrisma.map_Edit.updateMany(updateSubmittedBy as Prisma.Map_EditUpdateManyArgs),
 
