@@ -155,7 +155,7 @@ const ClaimUser: NextPage = () => {
                                     <td>
                                         <Button
                                             disabled={createUserClaimMutation.isLoading}
-                                            onClick={() => createUserClaimMutation.isLoading ? createUserClaimMutation.mutate({ claimedUserId: unclaimedUser.id }) : undefined}
+                                            onClick={() => createUserClaimMutation.isLoading ? undefined : createUserClaimMutation.mutate({ claimedUserId: unclaimedUser.id })}
                                         >
                                             Claim
                                         </Button>
