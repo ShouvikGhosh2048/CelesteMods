@@ -61,12 +61,25 @@ const VerifyClaim: NextPage = () => {
     const rejectUserClaimMutation = api.user.userClaim.delete.useMutation({ onSuccess });
 
 
-    const { classes } = useStyles();
-
-
     const isLoading = status === "loading";
 
     const isUserPermitted = !isLoading && sessionData !== null && isPermitted(sessionData.user.permissions, ADMIN_PERMISSION_STRINGS);
+
+
+    const { classes } = useStyles();
+
+
+    if (!isUserPermitted) {
+        return (
+            <Layout
+                pageTitle={PAGE_TITLE}
+                pageDescription={PAGE_DESCRIPTION}
+                pathname={VERIFY_CLAIM_PATHNAME}
+            >
+                <p>You do not have permission to view this page.</p>
+            </Layout>
+        );
+    }
 
 
     return (
@@ -104,72 +117,62 @@ const VerifyClaim: NextPage = () => {
                     </Stack>
                 )}
             </Modal>
-            {isUserPermitted ? (
-                <ScrollArea
-                    offsetScrollbars
-                    className={classes.scrollArea}
+            <ScrollArea
+                offsetScrollbars
+                className={classes.scrollArea}
+            >
+                <LoadingOverlay
+                    visible={isLoading}
+                    color="rgba(0, 0, 0, 0.5)"
+                />
+                <Title
+                    className={classes.pageTitle}
+                    order={1}
                 >
-                    <LoadingOverlay
-                        visible={isLoading}
-                        color="rgba(0, 0, 0, 0.5)"
-                    />
-                    <Title
-                        className={classes.pageTitle}
-                        order={1}
-                    >
-                        {PAGE_TITLE}
-                    </Title>
-                    <Table>
-                        <thead>
-                            <tr>
-                                <th>Claim ID</th>
-                                <th>By</th>
-                                <th>For</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {userClaims.map(
-                                (claim) => {
-                                    const claimingUser = `${claim.User_claimedBy.discordUsername}#${claim.User_claimedBy.discordDiscriminator}`;
-                                    const claimedUser = `${claim.User_claimedUser.discordUsername}#${claim.User_claimedUser.discordDiscriminator}`;
+                    {PAGE_TITLE}
+                </Title>
+                <Table>
+                    <thead>
+                        <tr>
+                            <th>Claim ID</th>
+                            <th>By</th>
+                            <th>For</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {userClaims.map(
+                            (claim) => {
+                                const claimingUser = `${claim.User_claimedBy.discordUsername}#${claim.User_claimedBy.discordDiscriminator}`;
+                                const claimedUser = `${claim.User_claimedUser.discordUsername}#${claim.User_claimedUser.discordDiscriminator}`;
 
-                                    return (
-                                        <tr key={claim.id}>
-                                            <td>{claim.id}</td>
-                                            <td>{claimingUser}</td>
-                                            <td>{claimedUser}</td>
-                                            <td>
-                                                <Button
-                                                    onClick={
-                                                        () => {
-                                                            setClaimToVerify({
-                                                                id: claim.id,
-                                                                claimingUser,
-                                                                claimedUser,
-                                                            });
-                                                        }
+                                return (
+                                    <tr key={claim.id}>
+                                        <td>{claim.id}</td>
+                                        <td>{claimingUser}</td>
+                                        <td>{claimedUser}</td>
+                                        <td>
+                                            <Button
+                                                onClick={
+                                                    () => {
+                                                        setClaimToVerify({
+                                                            id: claim.id,
+                                                            claimingUser,
+                                                            claimedUser,
+                                                        });
                                                     }
-                                                >
-                                                    Resolve
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    );
-                                }
-                            )}
-                        </tbody>
-                    </Table>
-                </ScrollArea>
-            ) : (
-                <Layout
-                    pageTitle={PAGE_TITLE}
-                    pageDescription={PAGE_DESCRIPTION}
-                    pathname={VERIFY_CLAIM_PATHNAME}
-                >
-                    <p>You do not have permission to view this page.</p>
-                </Layout>
-            )}
+                                                }
+                                            >
+                                                Resolve
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                );
+                            }
+                        )}
+                    </tbody>
+                </Table>
+            </ScrollArea>
         </Layout >
     );
 };
