@@ -208,7 +208,7 @@ export const userRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             return await ctx.prisma.user.findMany({
                 where: {
-                    accountStatus: 'Unlinked',
+                    accountStatus: "Unlinked",
                 },
                 select: {
                     id: true,
@@ -239,7 +239,7 @@ export const userRouter = createTRPCRouter({
 
     delete: loggedInProcedure
         .input(userIdSchema)
-        .mutation(async ({ ctx, input }) => {   //TODO!!!: mark the user as deleted here and update the other endpoints to not return deleted users. can be a follow-up issue. need to tidy up this whole router lol.
+        .mutation(async ({ ctx, input }) => {
             if (!ctx.session?.user) throw undefinedSessionError;
 
 
