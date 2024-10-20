@@ -1,4 +1,4 @@
-import { Button, createStyles, LoadingOverlay, ScrollArea, Table } from "@mantine/core";
+import { Button, createStyles, LoadingOverlay, ScrollArea, Table, Title } from "@mantine/core";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -6,12 +6,13 @@ import { Layout } from "~/components/layout/layout";
 import { cmlDiscordInviteUrl } from "~/consts/cmlDiscordInviteUrl";
 import { CLAIM_USER_PATHNAME } from "~/consts/pathnames";
 import { pageContentHeightPixels } from "~/styles/pageContentHeightPixels";
+import { pageTitle } from "~/styles/pageTitle";
 import { api } from "~/utils/api";
 
 
 
 
-const PAGE_TITLE = "Claim User";
+const PAGE_TITLE = "Claim Users";
 const PAGE_DESCRIPTION = "Submit a claim for a legacy user.";
 
 
@@ -19,13 +20,22 @@ const PAGE_DESCRIPTION = "Submit a claim for a legacy user.";
 
 const useStyles = createStyles(
     (theme) => ({
+        pageTitle,
         scrollArea: {
             height: `${pageContentHeightPixels}px`,
             color: theme.white,
         },
         discordLink: {
-            textDecoration: 'underline',
-        }
+            textDecoration: "underline",
+        },
+        sectionTitle: {
+            marginTop: "25px",
+            marginBottom: "4px",
+        },
+        sectionInfo: {
+            marginTop: "4px",
+            marginBottom: "4px",
+        },
     }),
 );
 
@@ -95,68 +105,67 @@ const ClaimUser: NextPage = () => {
             pageDescription={PAGE_DESCRIPTION}
             pathname={CLAIM_USER_PATHNAME}
         >
-            <LoadingOverlay
-                visible={status === "loading"}
+            <ScrollArea
+                offsetScrollbars
+                className={classes.scrollArea}
             >
-                <ScrollArea
-                    offsetScrollbars
-                    className={classes.scrollArea}
-                >
-                    <h1>{PAGE_TITLE}</h1>
-                    <h2>Claimed Users</h2>
-                    <p>
-                        Contact us on <Link href={cmlDiscordInviteUrl} className={classes.discordLink} target="_blank">Discord</Link> to get your claim verified.
-                    </p>
-                    <Table>
-                        <thead>
-                            <tr>
-                                <th>Claim ID</th>
-                                <th>User ID</th>
-                                <th>Username</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {userClaims.map(
-                                (claim) => (
-                                    <tr key={claim.id}>
-                                        <td>{claim.id}</td>
-                                        <td>{claim.claimedUserId}</td>
-                                        <td>{claim.User_claimedUser.discordUsername}#{claim.User_claimedUser.discordDiscriminator}</td>
-                                    </tr>
-                                )
-                            )}
-                        </tbody>
-                    </Table>
-                    <h2>Unclaimed Users</h2>
-                    <Table>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {unclaimedUsers.map(
-                                (unclaimedUser) => (
-                                    <tr key={unclaimedUser.id}>
-                                        <td>
-                                            {unclaimedUser.discordUsername}#{unclaimedUser.discordDiscriminator}
-                                        </td>
-                                        <td>
-                                            <Button
-                                                disabled={createUserClaimMutation.isLoading}
-                                                onClick={() => createUserClaimMutation.isLoading ? createUserClaimMutation.mutate({ claimedUserId: unclaimedUser.id }) : undefined}
-                                            >
-                                                Claim
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                )
-                            )}
-                        </tbody>
-                    </Table>
-                </ScrollArea>
-            </LoadingOverlay>
+                <LoadingOverlay
+                    visible={status === "loading"}
+                />
+                <Title className={classes.pageTitle} order={1}>{PAGE_TITLE}</Title>
+                <Title order={2}>Active Claims</Title>
+                <p className={classes.sectionInfo}>
+                    Contact us on <Link href={cmlDiscordInviteUrl} className={classes.discordLink} target="_blank">Discord</Link> to get your claims verified.
+                </p>
+                <Table>
+                    <thead>
+                        <tr>
+                            <th>Claim ID</th>
+                            <th>User ID</th>
+                            <th>Username</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {userClaims.map(
+                            (claim) => (
+                                <tr key={claim.id}>
+                                    <td>{claim.id}</td>
+                                    <td>{claim.claimedUserId}</td>
+                                    <td>{claim.User_claimedUser.discordUsername}#{claim.User_claimedUser.discordDiscriminator}</td>
+                                </tr>
+                            )
+                        )}
+                    </tbody>
+                </Table>
+                <Title className={classes.sectionTitle} order={2}>Unlinked Users</Title>
+                <Table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {unclaimedUsers.map(
+                            (unclaimedUser) => (
+                                <tr key={unclaimedUser.id}>
+                                    <td>
+                                        {unclaimedUser.discordUsername}#{unclaimedUser.discordDiscriminator}
+                                    </td>
+                                    <td>
+                                        <Button
+                                            disabled={createUserClaimMutation.isLoading}
+                                            onClick={() => createUserClaimMutation.isLoading ? createUserClaimMutation.mutate({ claimedUserId: unclaimedUser.id }) : undefined}
+                                        >
+                                            Claim
+                                        </Button>
+                                    </td>
+                                </tr>
+                            )
+                        )}
+                    </tbody>
+                </Table>
+            </ScrollArea>
         </Layout>
     );
 };
